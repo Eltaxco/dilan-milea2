@@ -186,6 +186,32 @@ Masukkan nama tamu, pisahkan menggunakan koma atau Enter.
 id="domain"
 value="https://domainanda.com/">
 
+
+
+<label>Template Pesan WhatsApp</label>
+
+<textarea id="templateMessage">
+Assalamu'alaikum Wr. Wb.
+
+Kepada Yth.
+{nama}
+
+Dengan memohon rahmat dan ridho Allah SWT, kami mengundang Bapak/Ibu/Saudara/i untuk hadir pada acara pernikahan kami.
+
+✨ Dilan & Milea ✨
+
+Silakan buka undangan melalui link berikut :
+
+{link}
+
+Merupakan suatu kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir serta memberikan doa restu.
+
+Terima kasih.
+Wassalamu'alaikum Wr. Wb.
+</textarea>
+
+
+
 <label>Daftar Nama</label>
 
 <textarea id="guest">
@@ -291,22 +317,28 @@ allLinks=[];
 
 names.forEach(name=>{
 
-const url=domain+"?to="+encodeURIComponent(name);
+const url = domain + "?to=" + encodeURIComponent(name);
 
-allLinks.push(url);
+const template = document.getElementById("templateMessage").value;
 
-result.innerHTML+=`
+const message = template
+.replaceAll("{nama}", name)
+.replaceAll("{link}", url);
 
+const wa =
+"https://wa.me/623820656825?text=sadsda" + encodeURIComponent(message);
+
+allLinks.push(message);
+
+result.innerHTML += `
 <div class="item">
 
 <input
 readonly
 value="${url}">
 
-<button onclick="copy('${url}')">
-
-Salin
-
+<button onclick="shareWA('${name}','${url}')">
+Bagikan WA
 </button>
 
 </div>
@@ -330,9 +362,9 @@ async function copy(text){
 
 function copyAll(){
 
-navigator.clipboard.writeText(allLinks.join("\n"));
+navigator.clipboard.writeText(allLinks.join("\n\n----------------------\n\n"));
 
-alert("Semua link berhasil disalin");
+showToast("✔ Semua pesan berhasil disalin");
 
 }
 
@@ -401,6 +433,38 @@ function showToast(message){
         toast.classList.remove("show");
 
     },2000);
+
+}
+
+function shareWA(nama, url){
+
+const pesan=`Assalamu'alaikum Warahmatullahi Wabarakatuh
+
+Kepada Yth.
+${nama}
+
+Dengan segala hormat kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami.
+
+Silakan buka undangan berikut:
+
+${url}
+
+Merupakan suatu kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir.
+
+Terima kasih.`;
+
+if(navigator.share){
+
+navigator.share({
+title:"Undangan Pernikahan",
+text:pesan
+});
+
+}else{
+
+navigator.clipboard.writeText(pesan);
+alert("Browser tidak mendukung fitur Bagikan.");
+}
 
 }
 
